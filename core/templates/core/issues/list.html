@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>⚠️ جميع القضايا / Findings</h3>
+
+<table class="table table-bordered bg-white">
+  <thead>
+    <tr>
+      <th>المشروع</th>
+      <th>أنشئت بواسطة</th>
+      <th>الوصف</th>
+      <th>التاريخ</th>
+      <th>تفاصيل</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for issue in issues %}
+      <tr>
+        <td>{{ issue.project }}</td>
+        <td>{{ issue.created_by }}</td>
+        <td>{{ issue.description|truncatechars:40 }}</td>
+        <td>{{ issue.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          <a href="{% url 'core:issue_detail' issue.id %}" class="btn btn-sm btn-info">عرض</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center">لا توجد قضايا حتى الآن.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

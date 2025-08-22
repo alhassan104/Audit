@@ -1,0 +1,29 @@
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
+  <div class="card shadow-sm" style="min-width:350px; max-width:400px;">
+    <div class="card-body">
+      <h3 class="text-center mb-4">🔐 Login</h3>
+
+      {% if form.errors %}
+        <div class="alert alert-danger">Incorrect username or password</div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input type="text" name="{{ form.username.name }}" value="{{ form.username.value }}" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="{{ form.password.name }}" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

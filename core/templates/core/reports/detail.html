@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>تقرير التدقيق</h2>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5>{{ report.title }}</h5>
+      <p>{{ report.notes }}</p>
+
+      {% if report.attachment %}
+        <p>
+          <a href="{{ report.attachment.url }}" target="_blank">📎 تحميل المرفق</a>
+        </p>
+      {% endif %}
+
+      <p class="text-muted">
+        <small>أنشئ بواسطة: {{ report.created_by }} بتاريخ {{ report.created_at }}</small>
+      </p>
+    </div>
+  </div>
+
+  {% if user.role == "audit_manager" %}
+    <form 
+      hx-post="{% url 'core:report_review' report.id %}" 
+      hx-target="#report-review-response" 
+      hx-swap="innerHTML"
+      class="mb-3"
+    >
+      <div class="form-group">
+        <label>ملاحظات المدير</label>
+        <textarea name="manager_notes" class="form-control"></textarea>
+      </div>
+      <div class="mt-2">
+        <button name="action" value="approve" class="btn btn-success">موافقة ✅</button>
+        <button name="action" value="reject" class="btn btn-danger">رفض ❌</button>
+      </div>
+    </form>
+    <div id="report-review-response"></div>
+  {% endif %}
+</div>
+{% endblock %}

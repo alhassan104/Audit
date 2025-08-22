@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<ul>
+    <li><a href="{% url 'core:projects_list' %}">Audit Projects</a></li>
+    <li><a href="#">Assignments</a></li>
+    <li><a href="#">Reports</a></li>
+</ul>
+{% endblock %}

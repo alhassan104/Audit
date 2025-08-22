@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Review Plan - {{ plan.project.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:manager_dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:project_detail' plan.project.id %}">{{ plan.project.title }}</a></li>
+                <li class="breadcrumb-item active">Review Plan</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Plan Details -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">📝 Audit Plan Review</h4>
+                <p class="text-muted mb-0">Project: {{ plan.project.title }}</p>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Submitted by:</strong> {{ plan.created_by.get_full_name|default:plan.created_by.username }}</p>
+                        <p><strong>Submitted on:</strong> {{ plan.created_at|date:"F d, Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            <span class="badge bg-{{ plan.status|yesno:'success,warning,danger' }}">
+                                {{ plan.get_status_display }}
+                            </span>
+                        </p>
+                        <p><strong>Department:</strong> {{ plan.project.department.name }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h6>Plan Description:</h6>
+                <div class="border rounded p-3 bg-light mb-3">
+                    {{ plan.description|linebreaks }}
+                </div>
+
+                {% if plan.attachment %}
+                <div class="mb-3">
+                    <h6>Original Attachment:</h6>
+                    <a href="{{ plan.attachment.url }}" class="btn btn-outline-primary" target="_blank">
+                        📎 {{ plan.attachment.name|slice:"12:" }}
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if plan.manager_notes %}
+                <div class="mb-3">
+                    <h6>Previous Manager Notes:</h6>
+                    <div class="border rounded p-3 bg-light">
+                        {{ plan.manager_notes|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Review Decision</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="action" class="form-label">Action *</label>
+                        <select class="form-select" id="action" name="action" required>
+                            <option value="">Select Action</option>
+                            <option value="approve">✅ Approve Plan</option>
+                            <option value="reject">❌ Reject Plan</option>
+                        </select>
+                        <div class="form-text">
+                            Approving will move the project to audit in progress. Rejecting will return it to the auditor for revision.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="manager_notes" class="form-label">Manager Notes</label>
+                        <textarea class="form-control" id="manager_notes" name="manager_notes" rows="4" 
+                                  placeholder="Provide feedback, comments, or suggestions for the auditor..."></textarea>
+                        <div class="form-text">
+                            These notes will be visible to the auditor. Required if rejecting the plan.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="attachment" class="form-label">Updated Attachment (Optional)</label>
+                        <input type="file" class="form-control" id="attachment" name="attachment" 
+                               accept=".pdf,.doc,.docx,.xls,.xlsx,.txt">
+                        <div class="form-text">
+                            Upload a revised version of the plan document if needed.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'core:manager_dashboard' %}" class="btn btn-secondary">
+                            ← Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            📋 Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Project Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Project Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>{{ plan.project.title }}</h6>
+                <p class="text-muted">{{ plan.project.description|truncatewords:20 }}</p>
+                
+                <hr>
+                
+                <p><strong>Department:</strong> {{ plan.project.department.name }}</p>
+                <p><strong>Created by:</strong> {{ plan.project.created_by.get_full_name|default:plan.project.created_by.username }}</p>
+                <p><strong>Project Status:</strong> 
+                    <span class="badge bg-{{ plan.project.status|yesno:'success,warning,info,secondary' }}">
+                        {{ plan.project.get_status_display }}
+                    </span>
+                </p>
+                
+                <hr>
+                
+                <h6>Assigned Auditors:</h6>
+                <ul class="list-unstyled">
+                    {% for assignment in plan.project.assignments.all %}
+                        <li>• {{ assignment.auditor.get_full_name|default:assignment.auditor.username }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'core:project_detail' plan.project.id %}" class="btn btn-outline-primary w-100 mb-2">
+                    📁 View Project
+                </a>
+                <a href="{% url 'core:plans_list' %}" class="btn btn-outline-warning w-100 mb-2">
+                    📝 All Plans
+                </a>
+                <a href="{% url 'core:manager_dashboard' %}" class="btn btn-outline-secondary w-100">
+                    🏠 Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

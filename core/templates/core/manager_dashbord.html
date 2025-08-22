@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="mb-3">📌 مشاريع التدقيق</h3>
+
+<button class="btn btn-primary mb-3"
+        hx-get="{% url 'core:project_create' %}"
+        hx-target="#modal-body"
+        hx-trigger="click"
+        data-bs-toggle="modal"
+        data-bs-target="#mainModal">➕ إضافة مشروع</button>
+
+<table class="table table-bordered bg-white">
+    <thead>
+        <tr>
+            <th>العنوان</th>
+            <th>القسم</th>
+            <th>المدققين</th>
+            <th>تاريخ الإنشاء</th>
+        </tr>
+    </thead>
+    <tbody id="projects-table">
+        {% for project in projects %}
+            {% include "core/partials/project_row.html" %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="mainModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">إنشاء مشروع تدقيق</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modal-body">
+          <!-- HTMX form will load here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

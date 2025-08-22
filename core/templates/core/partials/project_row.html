@@ -1,0 +1,12 @@
+<tr>
+    <td>{{ project.title }}</td>
+    <td>{{ project.department.name }}</td>
+    <td>
+        {% for assign in project.assignments.all %}
+            <span class="badge bg-info text-dark">{{ assign.auditor.username }}</span>
+        {% empty %}
+            <span class="text-muted">لا يوجد</span>
+        {% endfor %}
+    </td>
+    <td>{{ project.created_at|date:"Y-m-d" }}</td>
+</tr>

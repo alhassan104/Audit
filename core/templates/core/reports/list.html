@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>📑 جميع تقارير التدقيق</h3>
+
+<table class="table table-bordered bg-white">
+  <thead>
+    <tr>
+      <th>المشروع</th>
+      <th>أنشئ بواسطة</th>
+      <th>الحالة</th>
+      <th>التاريخ</th>
+      <th>تفاصيل</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for report in reports %}
+      <tr>
+        <td>{{ report.project }}</td>
+        <td>{{ report.created_by }}</td>
+        <td>{{ report.status }}</td>
+        <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          <a href="{% url 'core:report_detail' report.id %}" class="btn btn-sm btn-info">عرض</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center">لا توجد تقارير بعد.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

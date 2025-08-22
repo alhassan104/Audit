@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>خطة التدقيق</h2>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <p>{{ plan.notes }}</p>
+
+      {% if plan.attachment %}
+        <p>
+          <a href="{{ plan.attachment.url }}" target="_blank">📎 تحميل المستند</a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if user.role == "audit_manager" %}
+    <form 
+      hx-post="{% url 'core:plan_review' plan.id %}" 
+      hx-target="#plan-review-response" 
+      hx-swap="innerHTML"
+      class="mb-3"
+    >
+      <div class="form-group">
+        <label>ملاحظات المدير</label>
+        <textarea name="manager_notes" class="form-control"></textarea>
+      </div>
+      <div class="mt-2">
+        <button name="action" value="approve" class="btn btn-success">موافقة ✅</button>
+        <button name="action" value="reject" class="btn btn-danger">رفض ❌</button>
+      </div>
+    </form>
+    <div id="plan-review-response"></div>
+  {% endif %}
+</div>
+{% endblock %}

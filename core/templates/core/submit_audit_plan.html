@@ -1,0 +1,8 @@
+<form method="post" hx-post="{% url 'submit_audit_plan' project.id %}" hx-target="#modal-body">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">نص الخطة</label>
+        <textarea name="plan_text" class="form-control" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">إرسال</button>
+</form>

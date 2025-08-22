@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Audit Projects</h2>
+<button 
+    class="btn btn-primary mb-3"
+    hx-get="{% url 'core:project_create' %}"
+    hx-target="#modal-body"
+    hx-trigger="click"
+    data-bs-toggle="modal"
+    data-bs-target="#mainModal">
+    + Create Project
+</button>
+
+<div id="projects-table">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Department</th>
+                <th>Created By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for project in projects %}
+            <tr>
+                <td>{{ project.title }}</td>
+                <td>{{ project.department.name }}</td>
+                <td>{{ project.created_by }}</td>
+                <td>
+                    <button 
+                        class="btn btn-sm btn-info"
+                        hx-get="{% url 'core:project_detail' project.id %}"
+                        hx-target="#modal-body"
+                        data-bs-toggle="modal"
+                        data-bs-target="#mainModal">
+                        View
+                    </button>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4">No projects yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="mainModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

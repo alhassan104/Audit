@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} - Project Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:projects_list' %}">Projects</a></li>
+                <li class="breadcrumb-item active">{{ project.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Project Information -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ project.title }}</h4>
+                <span class="badge bg-{{ project.status|yesno:'success,warning,info,secondary' }} fs-6">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Department:</strong> {{ project.department.name }}</p>
+                        <p><strong>Created by:</strong> {{ project.created_by.get_full_name|default:project.created_by.username }}</p>
+                        <p><strong>Created:</strong> {{ project.created_at|date:"F d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> {{ project.get_status_display }}</p>
+                        <p><strong>Assigned Auditors:</strong></p>
+                        <ul class="list-unstyled">
+                            {% for assignment in project.assignments.all %}
+                                <li>• {{ assignment.auditor.get_full_name|default:assignment.auditor.username }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>Description:</h6>
+<p>{{ project.description }}</p>
+
+                {% if project.manager_notes %}
+                <h6>Manager Notes:</h6>
+                <p class="text-muted">{{ project.manager_notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Auditor Actions -->
+{% if is_assigned_auditor %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if project.status == 'created' %}
+                        <div class="col-md-6">
+                            <a href="{% url 'core:plan_create' project.id %}" class="btn btn-warning w-100 mb-2">
+                                📝 Start Plan
+                            </a>
+                        </div>
+                    {% endif %}
+                    
+                    {% if project.status == 'audit_in_progress' %}
+                        <div class="col-md-6">
+                            <a href="{% url 'core:issue_create' project.id %}" class="btn btn-info w-100 mb-2">
+                                ⚠️ Create Issue
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'core:report_create' project.id %}" class="btn btn-success w-100 mb-2">
+                                📑 Create Report
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <!-- Project Timeline -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Project Timeline</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6>Project Created</h6>
+                            <small class="text-muted">{{ project.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    
+                    {% if project.plans.exists %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-warning"></div>
+                        <div class="timeline-content">
+                            <h6>Plan Submitted</h6>
+                            <small class="text-muted">{{ project.plans.first.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if project.issues.exists %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-info"></div>
+                        <div class="timeline-content">
+                            <h6>Issues Created</h6>
+                            <small class="text-muted">{{ project.issues.first.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+{% endif %}
+
+                    {% if project.reports.exists %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6>Report Submitted</h6>
+                            <small class="text-muted">{{ project.reports.first.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-warning">{{ project.plans.count }}</h4>
+                        <small>Plans</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-info">{{ project.issues.count }}</h4>
+                        <small>Issues</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-primary">{{ project.reports.count }}</h4>
+                        <small>Reports</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success">{{ project.assignments.count }}</h4>
+                        <small>Auditors</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Items -->
+<div class="row mt-4">
+    <div class="col-12">
+        <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="plans-tab" data-bs-toggle="tab" data-bs-target="#plans" type="button" role="tab">
+                    📝 Plans ({{ project.plans.count }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="issues-tab" data-bs-toggle="tab" data-bs-target="#issues" type="button" role="tab">
+                    ⚠️ Issues ({{ project.issues.count }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                    📑 Reports ({{ project.reports.count }})
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="projectTabsContent">
+            <!-- Plans Tab -->
+            <div class="tab-pane fade show active" id="plans" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        {% if project.plans.exists %}
+{% for plan in project.plans.all %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6>Plan by {{ plan.created_by.get_full_name|default:plan.created_by.username }}</h6>
+                                        <p class="text-muted mb-2">{{ plan.description }}</p>
+                                        <span class="badge bg-{{ plan.status|yesno:'success,warning,danger' }}">
+                                            {{ plan.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ plan.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                {% if plan.attachment %}
+                                <div class="mt-2">
+                                    <a href="{{ plan.attachment.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        📎 View Attachment
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No plans submitted yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Issues Tab -->
+            <div class="tab-pane fade" id="issues" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        {% if project.issues.exists %}
+                            {% for issue in project.issues.all %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6>Issue by {{ issue.created_by.get_full_name|default:issue.created_by.username }}</h6>
+                                        <p class="text-muted mb-2">{{ issue.description }}</p>
+                                        <span class="badge bg-{{ issue.status|yesno:'success,warning,danger' }}">
+                                            {{ issue.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ issue.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                {% if issue.attachment %}
+                                <div class="mt-2">
+                                    <a href="{{ issue.attachment.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        📎 View Attachment
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No issues created yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <div class="card">
+                    <div class="card-body">
+                        {% if project.reports.exists %}
+                            {% for report in project.reports.all %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6>Report by {{ report.created_by.get_full_name|default:report.created_by.username }}</h6>
+                                        <p class="text-muted mb-2">{{ report.description }}</p>
+                                        <span class="badge bg-{{ report.status|yesno:'success,warning,danger' }}">
+                                            {{ report.get_status_display }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ report.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                {% if report.attachment %}
+                                <div class="mt-2">
+                                    <a href="{{ report.attachment.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        📎 View Attachment
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+{% endfor %}
+                        {% else %}
+                            <p class="text-muted">No reports submitted yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-content h6 {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.timeline-content small {
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %}

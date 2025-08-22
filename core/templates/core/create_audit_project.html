@@ -1,0 +1,32 @@
+<form method="post" hx-post="{% url 'create_audit_project' %}" hx-target="#projects-table" hx-swap="beforeend">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">العنوان</label>
+        <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">الوصف</label>
+        <textarea name="description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">القسم</label>
+        <select name="department" class="form-select" required>
+            {% for dept in departments %}
+                <option value="{{ dept.id }}">{{ dept.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">اختر المدققين</label>
+        <select name="auditors" class="form-select" multiple>
+            {% for auditor in auditors %}
+                <option value="{{ auditor.id }}">{{ auditor.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">إنشاء</button>
+</form>

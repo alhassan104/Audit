@@ -1,0 +1,10 @@
+<form 
+    hx-post="{% url 'core:issue_create' project.id %}" 
+    hx-target="#issues-list" 
+    hx-swap="outerHTML">
+    
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-danger">Submit Issue</button>
+</form>

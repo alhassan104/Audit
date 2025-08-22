@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>تفاصيل المشكلة</h2>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5>{{ issue.title }}</h5>
+      <p>{{ issue.notes }}</p>
+
+      {% if issue.attachment %}
+        <p>
+          <a href="{{ issue.attachment.url }}" target="_blank">📎 تحميل المرفق</a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if user.role == "audit_manager" %}
+    <form 
+      hx-post="{% url 'core:issue_review' issue.id %}" 
+      hx-target="#issue-review-response" 
+      hx-swap="innerHTML"
+      class="mb-3"
+    >
+      <div class="form-group">
+        <label>ملاحظات المدير</label>
+        <textarea name="manager_notes" class="form-control"></textarea>
+      </div>
+      <div class="mt-2">
+        <button name="action" value="approve" class="btn btn-success">موافقة ✅</button>
+        <button name="action" value="reject" class="btn btn-danger">رفض ❌</button>
+      </div>
+    </form>
+    <div id="issue-review-response"></div>
+  {% endif %}
+</div>
+{% endblock %}

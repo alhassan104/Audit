@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>قائمة خطط التدقيق</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>المشروع</th>
+            <th>المدقق</th>
+            <th>الحالة</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in plans %}
+        <tr>
+            <td>{{ p.project }}</td>
+            <td>{{ p.created_by }}</td>
+            <td>{{ p.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
