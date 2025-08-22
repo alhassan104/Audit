@@ -1,16 +1,9 @@
-# Environments
 venv/
 env/
 .env
-
-# Python / Django
 __pycache__/
 *.py[cod]
 *$py.class
 *.log
-
-# SQLite (لا ترفعه عادة)
 db.sqlite3
-
-# Media/User uploads
 media/
